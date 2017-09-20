@@ -46,7 +46,7 @@ RUN apk add --update \
 RUN curl https://getcomposer.org/installer | php7 -- --install-dir=/usr/bin --filename=composer
 
 # Build and install mediainfo
-ENV MEDIAINFO_VERSION 0.7.98
+ENV MEDIAINFO_VERSION 0.7.99
 RUN apk --update add gcc g++ && \
   mkdir -p /tmp && \
   cd /tmp && \
@@ -128,6 +128,21 @@ RUN cd /tmp && \
   cd /tmp && \
   rm -rf zephir php-yenc && \
   apk del --purge gcc re2c libc-dev sudo
+
+# Build and install par2
+ENV PAR2_VERSION "v0.7.4"
+RUN apk --update add gcc autoconf automake g++ python-dev openssl-dev libffi-dev && \
+  git clone https://github.com/Parchive/par2cmdline.git /tmp/par2 && \
+  cd /tmp/par2 && \
+  git checkout --quiet --force $PAR2_VERSION && \
+  ./automake.sh && \ 
+  ./configure --prefix=/usr && \
+  make && \
+  make install && \
+  cd / && \
+  rm -rf /tmp/par2 && \
+  apk del --purge automake gcc autoconf g++ python-dev openssl-dev libffi-dev && \
+  apk add libgomp
 
 # Create dir for importing nzbs
 RUN mkdir -p /var/www/nZEDb/resources/import
